@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class ShareappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'shareApp'
+    name = 'share_app'
