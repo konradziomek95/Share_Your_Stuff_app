@@ -3,13 +3,19 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, logout, login
 from .forms import LoginForm, RegisterForm
-from .models import User
+from .models import User, Institution
 
 
 # Create your views here.
 
 class LandingPage(TemplateView):
     template_name = 'share_app/index.html'
+
+    def get_context_data(self, **kwargs):
+        institutions = Institution.objects.all()
+        ctx = {'number': 1,
+               'institutions': institutions}
+        return ctx
 
 
 class AddDonation(View):
@@ -28,7 +34,6 @@ class Login(View):
         print(form.is_valid())
         if form.is_valid():
             cd = form.cleaned_data
-            print(form.cleaned_data)
             email = cd['email']
             password = cd['password']
             user = authenticate(email=email, password=password)
@@ -51,7 +56,6 @@ class Register(View):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-        print(form.is_valid())
         if form.is_valid():
             cd = form.cleaned_data
             first_name = cd['first_name']

@@ -38,7 +38,9 @@ class LoginForm(forms.Form):
     def clean(self):
         cd = super().clean()
         email = cd.get('email')
+        print(email)
         password = cd.get('password')
+        print(password)
         user = authenticate(email=email, password=password)
         if user is None:
             raise ValidationError("Wrong mail or password!")

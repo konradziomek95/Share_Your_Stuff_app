@@ -50,12 +50,18 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(max_length=256)
 
+    def __str__(self):
+        return self.name
+
 
 class Institution(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField()
-    type = models.CharField(max_length=24, choices=TYPE, default=1)
+    type = models.IntegerField(choices=TYPE, default=1)
     categories = models.ManyToManyField(Category)
+
+    def __str__(self):
+        return self.name
 
 
 class Donation(models.Model):
