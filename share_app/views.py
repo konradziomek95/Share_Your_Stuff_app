@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import LoginForm, RegisterForm
-from .models import User, Institution
+from .models import  Category,Institution, User
 
 
 # Create your views here.
@@ -13,14 +14,15 @@ class LandingPage(TemplateView):
 
     def get_context_data(self, **kwargs):
         institutions = Institution.objects.all()
+        foundations = Institution.objects.filter(type=1)
+        organizations = Institution.objects.filter(type=2)
+        charity = Institution.objects.filter(type=3)
         ctx = {'number': 1,
-               'institutions': institutions}
+               'institutions': institutions,
+               'foundations': foundations,
+               'organizations': organizations,
+               'charity': charity}
         return ctx
-
-
-class AddDonation(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'share_app/form.html')
 
 
 class Login(View):
@@ -68,3 +70,14 @@ class Register(View):
                                      last_name=last_name)
             return redirect('/login/')
         return redirect('register')
+
+
+class AddDonation(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        institutions = Institution.objects.all()
+        ctx = {'categories': categories,
+               'institutions': institutions}
+        return render(request, 'share_app/form.html', ctx)
