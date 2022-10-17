@@ -1,10 +1,12 @@
+import json
 from django.shortcuts import render, redirect
 from django.views import View
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import LoginForm, RegisterForm
-from .models import  Category,Institution, User
+from .models import Category, Institution, User
 
 
 # Create your views here.
@@ -81,3 +83,13 @@ class AddDonation(LoginRequiredMixin, View):
         ctx = {'categories': categories,
                'institutions': institutions}
         return render(request, 'share_app/form.html', ctx)
+
+    def post(self, request, *args, **kwargs):
+        data_from_post = json.load(request)['phone']
+        print(data_from_post)
+        data = {'my_data': data_from_post}
+        return redirect('success')
+
+
+class SuccessFormView(TemplateView):
+    template_name = 'share_app/form-confirmation.html'

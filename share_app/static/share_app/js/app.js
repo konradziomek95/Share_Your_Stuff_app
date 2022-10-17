@@ -237,12 +237,25 @@ document.addEventListener("DOMContentLoaded", function () {
             this.$step.parentElement.hidden = this.currentStep >= 6;
 
             // TODO: get data from inputs and show them in summary
-            // if(this.currentStep == 1) {
-            //       const address = document.getElementsByName('address')[0]
-            //       const elem =document.querySelector('#address')
-            //     elem.innerText = address
-            // }
+            console.log(this.currentStep)
+            if (this.currentStep == 5) {
+                const form = document.querySelector('form')
+                const newForm = new FormData(form)
+                console.log(newForm.get('organization'))
+                const org = newForm.get('organization')
+                document.querySelector('#address').innerText = newForm.get('address')
+                document.querySelector('#city').innerText = newForm.get('city')
+                document.querySelector('#postcode').innerText = newForm.get('postcode')
+                document.querySelector('#phone').innerText = newForm.get('phone')
+                document.querySelector('#data').innerText = newForm.get('data')
+                document.querySelector('#time').innerText = newForm.get('time')
+                document.querySelector('#info').innerText = newForm.get('info')
+                document.querySelector('#bags').textContent = `${newForm.get('bags')} worki z darowizną`
+                document.querySelector('#foundations').textContent = ` Dla ${org}`
+            }
+
         }
+
 
         /**
          * Submit form
@@ -251,14 +264,57 @@ document.addEventListener("DOMContentLoaded", function () {
          */
         submit(e) {
             e.preventDefault();
+            // const token = document.getElementsByName("csrfmiddlewaretoken")[0]
+            const form = document.querySelector('form')
+            const formData = new FormData(form);
+            const dataObject = {};
+            formData.forEach((value, key) => dataObject[key] = value);
+
+            const getCookie = (name) => {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    let cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+            fetch('http://127.0.0.1:8000/form/', {
+                method: 'post',
+                credentials: 'same-origin',
+                headers: {
+                    "Content-type": 'application/json',
+                    "X-CSRFToken": csrftoken
+
+                },
+                body: JSON.stringify(dataObject),
+            }).then(response => {
+                window.location.replace(response.url)
+            })
             this.currentStep++;
             this.updateForm();
         }
-    }
+        }
 
-    const form = document.querySelector(".form--steps");
-    if (form !== null) {
-        new FormSteps(form);
-    }
-});
+        const
+        form = document.querySelector(".form--steps");
 
+        if(form
+
+    !==
+        null
+    ) {
+        new
+
+        FormSteps(form);
+    }
+})
+    ;
