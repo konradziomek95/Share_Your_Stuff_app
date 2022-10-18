@@ -1,0 +1,20 @@
+{% extends 'share_app/base.html' %}
+{% load static %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <table>
+            <tr><h2>Imię : {{ user.first_name }}</h2></tr>
+            <tr><h2>Nazwisko: {{ user.last_name }}</h2></tr>
+            <tr><h2>Email: {{ user.email }}</h2></tr>
+        </table>
+    {% endif %}
+    {% if donations %}
+        {% for donation in donations %}
+            <div class="container">
+                <h2> Instytucja: {{ donation.institution }}</h2>
+                <h2> Ilość worków: {{ donation.quantity }}</h2>
+                <h2> Data: {{ donation.pick_up_date }}</h2>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

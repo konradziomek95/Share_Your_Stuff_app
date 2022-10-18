@@ -241,17 +241,18 @@ document.addEventListener("DOMContentLoaded", function () {
             if (this.currentStep == 5) {
                 const form = document.querySelector('form')
                 const newForm = new FormData(form)
-                console.log(newForm.get('organization'))
                 const org = newForm.get('organization')
+                const organizationInput = document.querySelector(`input[name="organization"][value="${org}"]`)
+                const organizationName = organizationInput.parentElement.querySelector('.title').innerText
                 document.querySelector('#address').innerText = newForm.get('address')
                 document.querySelector('#city').innerText = newForm.get('city')
                 document.querySelector('#postcode').innerText = newForm.get('postcode')
                 document.querySelector('#phone').innerText = newForm.get('phone')
                 document.querySelector('#data').innerText = newForm.get('data')
                 document.querySelector('#time').innerText = newForm.get('time')
-                document.querySelector('#info').innerText = newForm.get('info')
+                document.querySelector('#info').innerText = newForm.get('more_info')
                 document.querySelector('#bags').textContent = `${newForm.get('bags')} worki z darowizną`
-                document.querySelector('#foundations').textContent = ` Dla ${org}`
+                document.querySelector('#foundations').textContent = ` Dla ${organizationName}`
             }
 
         }
@@ -264,9 +265,19 @@ document.addEventListener("DOMContentLoaded", function () {
          */
         submit(e) {
             e.preventDefault();
-            // const token = document.getElementsByName("csrfmiddlewaretoken")[0]
             const form = document.querySelector('form')
             const formData = new FormData(form);
+            const checkbox = document.querySelectorAll('input[name="categories"]')
+            const check = () => {
+                const category = []
+                for (const elem of checkbox) {
+                    if (elem.checked) {
+                        category.push(elem.value)
+                    }
+
+                }return category
+            }
+            formData.set('categories', check())
             const dataObject = {};
             formData.forEach((value, key) => dataObject[key] = value);
 
@@ -276,7 +287,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     let cookies = document.cookie.split(';');
                     for (let i = 0; i < cookies.length; i++) {
                         const cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
                         if (cookie.substring(0, name.length + 1) === (name + '=')) {
                             cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                             break;
@@ -302,14 +312,13 @@ document.addEventListener("DOMContentLoaded", function () {
             this.currentStep++;
             this.updateForm();
         }
-        }
+    }
 
-        const
+    const
         form = document.querySelector(".form--steps");
 
-        if(form
-
-    !==
+    if (form
+        !==
         null
     ) {
         new
@@ -317,4 +326,4 @@ document.addEventListener("DOMContentLoaded", function () {
         FormSteps(form);
     }
 })
-    ;
+;

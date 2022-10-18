@@ -1,12 +1,11 @@
 import json
 from django.shortcuts import render, redirect
 from django.views import View
-from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import LoginForm, RegisterForm
-from .models import Category, Institution, User
+from .models import Category, Donation, Institution, User
 
 
 # Create your views here.
@@ -19,7 +18,12 @@ class LandingPage(TemplateView):
         foundations = Institution.objects.filter(type=1)
         organizations = Institution.objects.filter(type=2)
         charity = Institution.objects.filter(type=3)
-        ctx = {'number': 1,
+        donations = Donation.objects.all()
+        number_of_bags = 0
+        for donation in donations:
+            number_of_bags += donation.quantity
+
+        ctx = {'number': number_of_bags,
                'institutions': institutions,
                'foundations': foundations,
                'organizations': organizations,
@@ -76,6 +80,7 @@ class Register(View):
 
 class AddDonation(LoginRequiredMixin, View):
     login_url = '/login/'
+    form_class = 1
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
@@ -85,11 +90,37 @@ class AddDonation(LoginRequiredMixin, View):
         return render(request, 'share_app/form.html', ctx)
 
     def post(self, request, *args, **kwargs):
-        data_from_post = json.load(request)['phone']
-        print(data_from_post)
-        data = {'my_data': data_from_post}
+        user = self.request.user
+        data = json.load(request)
+        obj = Donation.objects.create(user=user,
+                                      institution_id=int(data['organization']),
+                                      quantity=int(data['bags']),
+                                      address=data['address'],
+                                      city=data['city'],
+                                      zip_code=data['postcode'],
+                                      phone_number=data['phone'],
+                                      pick_up_date=data['data'],
+                                      pick_up_time=data['time'],
+                                      pick_up_comment=data['more_info']
+                                      )
+        categories = data['categories'].split(',')
+        for elem in categories:
+            category_object = Category.objects.get(pk=int(elem))
+            obj.categories.add(category_object)
+        obj.save()
         return redirect('success')
 
 
 class SuccessFormView(TemplateView):
     template_name = 'share_app/form-confirmation.html'
+
+
+class UserView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        donations = Donation.objects.filter(user=user)
+        if donations:
+            return render(request, 'share_app/user.html', {'donations': donations})
+        return render(request, 'share_app/user.html')

@@ -21,10 +21,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', v.LandingPage.as_view(), name='index'),
     path('login/', v.Login.as_view(), name='login'),
-    path('logout/',v.Logout.as_view(), name='logout'),
+    path('logout/', v.Logout.as_view(), name='logout'),
     path('register/', v.Register.as_view(), name='register'),
     path('form/', v.AddDonation.as_view(), name='add-donation'),
-    path('send/', v.SuccessFormView.as_view(), name='success')
-
+    path('send/', v.SuccessFormView.as_view(), name='success'),
+    path('user/', v.UserView.as_view(), name='user'),
 
 ]
